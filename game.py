@@ -31,18 +31,43 @@ class Board():
         new_board = [[self.board[i][3 - j] for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
         self.board = [row[:] for row in new_board]
 
+    def move_square_up(self, i, j, collapsed_pos):
+        board = self.board
+        current_value = board[i][j]
+        if current_value != 0:
+            valid_pos = None
+            for trial_pos in reversed(range(0, i)):
+                if trial_pos >= collapsed_pos:
+                    if board[trial_pos][j] == 0:
+                        valid_pos = trial_pos
+                    else:
+                        if board[trial_pos][j] == current_value:
+                            board[trial_pos][j] += board[i][j]
+                            board[i][j] = 0
+                            return trial_pos
+                        else:
+                            break
+            if valid_pos is not None:
+                board[valid_pos][j] = board[i][j]
+                board[i][j] = 0
+        return collapsed_pos
+
+    def move_up(self):
+        # working through all the columns, work downwards, and push values up to their final destination
+        old_board = [row[:] for row in self.board]
+        for j in range(BOARD_SIZE):
+            collapsed_pos = -1
+            for i in range(1, BOARD_SIZE):
+                collapsed_pos = self.move_square_up(i, j, collapsed_pos)
+        return self.board != old_board
+
     # Instead of making moves in all directions, we rotate the board and rotate back to simulate.
     def make_move(self, direction):
         for i in range(direction):
             self.rotate_clockwise()
-
-        # move up
         move_worked = self.move_up()
-
-        # rotate (4 - direction) % 4 times
         for i in range((BOARD_SIZE - direction) % 4):
             self.rotate_clockwise()
-
         return move_worked
 
     def print_board(self):
