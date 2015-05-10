@@ -3,6 +3,35 @@ import random
 
 BOARD_SIZE = 4
 
+class Board():
+    def __init__(self, copy_board=None):
+        if copy_board is None:
+            self.board = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+        else:
+            self.board = [[copy_board[i][j] for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
+
+    def countZeros(self):
+        return sum([row.count(0) for row in self.board])
+
+    def score(self):
+        return sum([sum(row) for row in self.board])
+
+    def addRandomTwo(self):
+        num_zeros = self.countZeros()
+        add_at_zero = 1 if num_zeros == 1 else random.randint(1, num_zeros)
+        for i in range(BOARD_SIZE):
+            for j in range(BOARD_SIZE):
+                if self.board[i][j] == 0:
+                    add_at_zero -= 1
+                    if add_at_zero == 0:
+                        self.board[i][j] = 2
+                        return
+
+    def printBoard(self):
+        for row in self.board:
+            print row
+        print "\n\n"
+
 class Game():
     def __init__(self):
         board = [[0 for i in range(BOARD_SIZE)] for j in range(BOARD_SIZE)]
@@ -110,12 +139,8 @@ class Player1():
 if __name__ == "__main__":
     my_game = Game()
 
-    while 1:
-        c = raw_input('helllo')
-        print  c, "xcxc", c == u"\u2192"
-
-    for i in range(400):
-        valid_move = my_game.takeTurn((i % 4))
+    for main_i in range(400):
+        valid_move = my_game.takeTurn((main_i % 4))
         if not valid_move:
             print "YOU SUCK, SCORE ", my_game.currentScore()
             break
